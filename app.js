@@ -29,6 +29,6 @@ app.all('*', (req, res, next) => {
 app.use(globalErrorHandler);
 
 //LISTEN ON PORT
-app.listen(process.env.PORT, () => {
-    console.log(`connect to port ${process.env.PORT}`);
+app.listen(3000, () => {
+    console.log(`connect to port 3000`);
 })
