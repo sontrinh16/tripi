@@ -21,6 +21,8 @@ app.post('/api/register', authenticationControllers.register);
 app.use('/api/hotels', hotelRouter);
 app.use('/api/users', userRouter);
 
+dotenv.config({path: path.join(__dirname, 'config.env')});
+
 app.all('*', (req, res, next) => {
     next(new appError(404, 'invalid URL'));
 });
