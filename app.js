@@ -16,7 +16,7 @@ app.use(cookieParser());
 dotenv.config({path: path.join(__dirname, 'config.env')});
 
 //ROUTERS
-app.get('/api', (req,res) => {
+app.get('/', (req,res) => {
     res.send('Hello world!');
 })
 app.post('/api/login', authenticationControllers.login);
