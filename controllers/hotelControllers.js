@@ -11,6 +11,8 @@ exports.getHotels = catchAsync( async (req,res,next) => {
 
     const hotels = await queryFunc(query);
 
+    //console.log(hotels)
+
     if (hotels.length === 0) return next(new appError(404, 'No hotels found'));
 
     res.status(200).json({
@@ -25,18 +27,27 @@ exports.getHotel = catchAsync( async (req,res,next) => {
 
     console.log(req.params.id)
 
-    const hotel = await queryFunc(query);
+    const hotels = await queryFunc(query);
 
-    if (hotel.length === 0) return next(new appError(404, 'No hotels found'));
+    if (hotels.length === 0) return next(new appError(404, 'No hotels found'));
+
+    const hotel = hotels[0];
+
+    const query_2 = `select * from review where domain_hotel_id = ${hotel.domain_hotel_id} and domain_id = ${hotel.domain_id}`;
+
+    const reviews = await queryFunc(query_2);
 
     res.status(200).json({
         status: 'success',
         data: {
-            hotel
+            hotel,
+            reviews
         }
     })
 });
 
+
+
 exports.searchHotels = catchAsync( async (req,res,next) => {
-    
+
 });

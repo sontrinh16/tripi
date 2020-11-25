@@ -15,6 +15,10 @@ exports.register = catchAsync( async ( req, res, next) => {
 
     await queryFunc(query);
 
+    res.status(200).json({
+        status: 'success'
+    })
+
 })
 
 exports.login = catchAsync( async (req, res, next) => {
