@@ -49,9 +49,9 @@ exports.getHotel = catchAsync( async (req,res,next) => {
 
 
 exports.searchHotels = catchAsync( async (req,res,next) => {
-    const {name} = req.body;
+    const {root_name} = req.body;
 
-    const query = `select * from data_hotel where root_name like '%${name}%'`;
+    const query = `select * from data_hotel where root_name like '%${root_name}%'`;
 
     const hotels = await queryFunc(query);
 
