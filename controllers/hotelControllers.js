@@ -49,5 +49,19 @@ exports.getHotel = catchAsync( async (req,res,next) => {
 
 
 exports.searchHotels = catchAsync( async (req,res,next) => {
+    const {name} = req.body;
+
+    const query = `select * from data_hotel where root_name like '%${name}%'`;
+
+    const hotels = await queryFunc(query);
+
+    if (hotels.length === 0) return next(new appError(404, 'No hotels found'));
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            hotels
+        }
+    })
 
 });
