@@ -9,13 +9,13 @@ const axios = require('axios');
 const queryFunc = util.promisify(connection.query).bind(connection);
 
 exports.getHotels = catchAsync( async (req,res,next) => {
-    const query = 'select * from data_hotel';
+    const query = 'select * from hotel_distinct';
 
     const hotels = await queryFunc(query);
 
     //console.log(hotels)
 
-    if (hotels.length === 0) return next(new appError(404, 'No hotels found'));
+    //if (hotels.length === 0) return next(new appError(404, 'No hotels found'));
 
     res.status(200).json({
         status: 'success',
@@ -25,7 +25,7 @@ exports.getHotels = catchAsync( async (req,res,next) => {
     })
 });
 exports.getHotel = catchAsync( async (req,res,next) => {
-    const query = `select * from data_hotel where hotel_id = '${req.params.id}'`;
+    const query = `select distinct * from data_hotel dh inner join domain d on dh.domain_id = d.id where dh.hotel_id = '${req.params.id}'`;
 
     console.log(req.params.id)
 
@@ -45,38 +45,55 @@ exports.getHotel = catchAsync( async (req,res,next) => {
 
     const prices = await queryFunc(query_3);
 
-    const hotel_ids = '';
-
-    if (prices.length !== 0) {
+    if(prices.length !== 0) {
         const price = prices[0];
-        hotel_ids = `${price.domain_id}_${price.domain_hotel_id}_${price.checkin_date_id}`;
+
+        const hotel_ids = `${price.domain_id}_${price.domain_hotel_id}_${price.checkin_date_id}`;
+
         console.log(hotel_ids);
-        var hotel_prices = await axios.post('https://tripgle.data.tripi.vn/get_price', {
-        headers: {
-            'Authorization': 'Basic dHJpcGdsZTpJWkRobm12cjBIU2ZPV1pSekhmZw=='
-        }}, JSON.stringify({ hotel_ids: hotel_ids }));
+
+        const data = JSON.stringify({
+            hotel_ids: hotel_ids
+        });
+
+        console.log(data)
+
+        const hotel_prices = await axios.post('https://tripgle.data.tripi.vn/get_price', 
+                                            data, {
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'Authorization': 'Basic dHJpcGdsZTpJWkRobm12cjBIU2ZPV1pSekhmZw=='
+                                                }
+                                            });
+
+        console.log(hotel_prices.data)
+        res.status(200).json({
+            status: 'success',
+            data: {
+                hotel,
+                reviews,
+                hotel_prices: hotel_prices.data,
+                number_of_reviews: reviews.length
+            }
+        })
     }
-
-    // const price = prices[0];
-
-    // const hotel_ids = `${price.domain_id}_${price.domain_hotel_id}_${price.checkin_date_id}`;
-
-    // console.log(hotel_ids)
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            hotel,
-            reviews,
-            hotel_prices
-        }
-    })
+    else {
+        res.status(200).json({
+            status: 'success',
+            data: {
+                hotel,
+                reviews,
+                hotel_prices: [],
+                number_of_reviews: reviews.length
+            }
+        })
+    }
 });
 
 exports.searchHotels = catchAsync( async (req,res,next) => {
     const {root_name} = req.body;
 
-    const query = `select * from data_hotel where root_name like '%${root_name}%'`;
+    const query = `select distinct * from data_hotel dh inner join domain d on dh.domain_id = d.id where dh.root_name like '%${root_name}%'`;
 
     let hotels = await queryFunc(query);
 
